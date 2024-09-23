@@ -1,10 +1,13 @@
 # BSON to Parquet
-A couple of simple utilities to convert BSON dumps to Parquet files.
-Use `print_bson.py` to inspect the BSON dump (in particular with the '-f' option) 
-and see what might want to exclude, and what you might want to be integer column.
-All other columns are forced to be strings.
-Then use `bson_to_parquet.py` with the appropriate options to -x and -i 
-to convert the BSON dump to Parquet.
+A couple of simple utilities I wrote for my own use to convert BSON dumps from
+MongoDB to Parquet files. It is kinda slow, and works just well enough for my
+purposes. 
+
+Use `print_bson.py` to inspect the BSON dump (in particular
+with the '-f' option) and see what might want to exclude, and what you
+might want to be integer column.  All other columns are forced to be strings.
+Then use `bson_to_parquet.py` with the appropriate options to -x and -i to
+convert the BSON dump to Parquet.
 
 ## Print BSON
 ```
