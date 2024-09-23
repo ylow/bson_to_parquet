@@ -29,7 +29,7 @@ options:
 ## Convert BSON to Parquet
 ```
 $ python ~/repos/bson_to_parquet/bson2parquet.py -h
-usage: bson2parquet [-h] [-x EXCLUDE] [-i INTEGER] input output
+usage: bson2parquet [-h] [-x EXCLUDE] [-i INTEGER] [-l LIMIT] input output
 
 Converts BSON dump (from mongo) to parquet. 
 Automatically recursively flattens dictionaries. Lists are not supported.
@@ -46,5 +46,7 @@ options:
   -i INTEGER, --integer INTEGER
                         if column name is this string it is forced to be integer. 
                         This option can be repeated. Example: -i size
+  -l LIMIT, --limit LIMIT
+                        Maximum number of rows to process
 ```
 

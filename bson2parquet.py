@@ -18,7 +18,7 @@ def unpack_dictionaries(doc):
     return doc
 
 
-def bson_infer_col(bson_file_path: str):
+def bson_infer_col(bson_file_path: str, limit: int):
     # Open the BSON file
     l = 0
     print("Inferring columns")
@@ -52,6 +52,9 @@ def bson_infer_col(bson_file_path: str):
                 doc = unpack_dictionaries(doc)
                 for i in doc:
                     colnames.add(i)
+
+                if limit is not None and l >= limit:
+                    break
             except Exception as e:
                 print(f"Error processing document: {e}")
                 import pdb
@@ -62,7 +65,7 @@ def bson_infer_col(bson_file_path: str):
 
 
 
-def bson_to_parquet_chunked(bson_file_path: str, parquet_file_path: str, colnames: set, intcols: set, chunk_size: int = 1000):
+def bson_to_parquet_chunked(bson_file_path: str, parquet_file_path: str, colnames: set, intcols: set, limit: int, chunk_size: int = 1000):
     """
     Converts a BSON file to a Parquet file by processing it in chunks.
 
@@ -123,6 +126,9 @@ def bson_to_parquet_chunked(bson_file_path: str, parquet_file_path: str, colname
                     except:
                         doc[i] = 0
                 chunk.append(doc)
+
+                if limit is not None and l >= limit:
+                    break
                 
                 # If chunk is full, process it
                 if len(chunk) >= chunk_size:
@@ -188,12 +194,20 @@ if __name__ == "__main__":
                         help='''if column name is this string it is forced to be integer. 
                         This option can be repeated. 
                         Example: -i size''')
+    parser.add_argument('-l', '--limit', type=int,  
+                        help='''Maximum number of rows to process''')
     args = parser.parse_args()
     print(args)
+    exclude = args.exclude
+    if exclude is None:
+        exclude = []
+    integers = args.integer
+    if integers is None:
+        integers = []
     print("Performing first pass")
-    colnames = bson_infer_col(args.input)
+    colnames = bson_infer_col(args.input, args.limit)
     for i in list(colnames):
-        for j in args.exclude:
+        for j in exclude:
             if j in i:
                 colnames.remove(i)
     print("-------------------------")
@@ -201,4 +215,4 @@ if __name__ == "__main__":
     print(colnames)
     print("-------------------------")
     print("Performing second and final pass")
-    bson_to_parquet_chunked(args.input, args.output, colnames, set(args.integer), chunk_size=100000)
+    bson_to_parquet_chunked(args.input, args.output, colnames, set(integers), args.limit,chunk_size=100000)
