@@ -119,10 +119,9 @@ def bson_to_parquet_chunked(bson_file_path: str, parquet_file_path: str, colname
                 for i in colnames:
                     if i not in doc:
                         doc[i] = ''
-                # special case 'size'
                 for i in intcols:
                     try:
-                        doc[i] = int(doc[i])
+                        doc[i] = int(float(doc[i]))
                     except:
                         doc[i] = 0
                 chunk.append(doc)
@@ -196,6 +195,10 @@ if __name__ == "__main__":
                         Example: -i size''')
     parser.add_argument('-l', '--limit', type=int,  
                         help='''Maximum number of rows to process''')
+    parser.add_argument('-c', '--cols', type=str,
+                        help='''A list of columns as a comma separated string. 
+                        Column inference will be skipped.
+                        Example: -c id,name,size''')
     args = parser.parse_args()
     print(args)
     exclude = args.exclude
@@ -205,7 +208,10 @@ if __name__ == "__main__":
     if integers is None:
         integers = []
     print("Performing first pass")
-    colnames = bson_infer_col(args.input, args.limit)
+    if args.cols is not None:
+        colnames = set([i.strip() for i in args.cols.split(",")])
+    else:
+        colnames = bson_infer_col(args.input, args.limit)
     for i in list(colnames):
         for j in exclude:
             if j in i:

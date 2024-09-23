@@ -48,5 +48,8 @@ options:
                         This option can be repeated. Example: -i size
   -l LIMIT, --limit LIMIT
                         Maximum number of rows to process
+  -c COLS, --cols COLS  A list of columns as a comma separated string. 
+                        Column inference will be skipped. 
+                        Example: -c id,name,size
 ```
 
