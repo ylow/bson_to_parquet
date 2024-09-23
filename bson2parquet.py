@@ -95,6 +95,7 @@ def bson_to_parquet_chunked(bson_file_path: str, parquet_file_path: str, colname
                 doc_data = size_data + f.read(doc_size - 4)
                 l += 1
                 if l % 100000 == 0:
+                    print("Reading")
                     print(l)
 
                 # Decode the BSON document
@@ -139,7 +140,7 @@ def bson_to_parquet_chunked(bson_file_path: str, parquet_file_path: str, colname
                     if parquet_writer is None:
                         parquet_writer = pq.ParquetWriter(parquet_file_path, table.schema)
                     parquet_writer.write_table(table)
-                    print("write")
+                    print("Writing")
                     print(l)
 
                     # Clear the chunk
@@ -153,7 +154,10 @@ def bson_to_parquet_chunked(bson_file_path: str, parquet_file_path: str, colname
 
         # Final processing for the last chunk
         if chunk:
-            df = pd.DataFrame(chunk)
+            df = pd.DataFrame(chunk, index=None)
+            cols = sorted(df.columns.tolist())
+            df = df[cols]
+            print(df)
             table = pa.Table.from_pandas(df)
             if parquet_writer is None:
                 parquet_writer = pq.ParquetWriter(parquet_file_path, table.schema)
